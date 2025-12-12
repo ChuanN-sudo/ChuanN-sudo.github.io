@@ -61,7 +61,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -87,7 +87,7 @@
   <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand" href="/">
-      <strong>Fluid</strong>
+      <strong>Chuann&#39;s Blogs</strong>
     </a>
 
     <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
@@ -165,7 +165,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="An elegant Material-Design theme for Hexo"></span>
+            <span id="subtitle" data-typed-text="悲喜总无泪也，是人间白发，剑胆成灰"></span>
           
         </div>
 
@@ -203,7 +203,7 @@
     
       <div class="col-12 col-md-4 m-auto index-img">
         <a href="/2025/12/12/K230%20spi%E9%A9%B1%E5%8A%A8%E7%A7%BB%E6%A4%8D/" target="_self">
-          <img src="/img/Mahina2_4k.jpg" srcset="/img/loading.gif" lazyload alt="K230 spi驱动移植">
+          <img src="/img/Mahina2_4k.jpg" alt="K230 spi驱动移植">
         </a>
       </div>
     
@@ -278,7 +278,7 @@
     
       <div class="col-12 col-md-4 m-auto index-img">
         <a href="/2025/12/12/K230%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" target="_self">
-          <img src="/img/Mahina2_4k.jpg" srcset="/img/loading.gif" lazyload alt="K230开发环境搭建">
+          <img src="/img/Mahina2_4k.jpg" alt="K230开发环境搭建">
         </a>
       </div>
     
@@ -293,7 +293,7 @@
       
       <a class="index-excerpt " href="/2025/12/12/K230%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" target="_self">
         <div>
-          硬件介绍K230芯片大致框图如下，图源K230技术参考手册：  核心是两颗玄铁RISC-V C908，一个800MHz的小核cpu0，1.6GHz的大核cpu1。嘉楠官方给了两种开发方式，第一种是小核cpu0跑Linux，大核cpu1跑rt-smart的异构架构，另一种是纯rt-smart架构，似乎只跑在大核上。由于多核通信很麻烦，我只用了rt-smart版本进行开发。 环境搭建k230 rt-s
+          硬件介绍K230芯片大致框图如下，图源K230技术参考手册  核心是两颗玄铁RISC-V C908，一个800MHz的小核cpu0，1.6GHz的大核cpu1。嘉楠官方给了两种开发方式，第一种是小核cpu0跑Linux，大核cpu1跑rt-smart的异构架构，另一种是纯rt-smart架构，似乎只跑在大核上。由于多核通信很麻烦，我只用了rt-smart版本进行开发。 环境搭建k230 rt-sm
         </div>
       </a>
 
@@ -438,10 +438,6 @@
 
 
 
-
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
 
 
 
