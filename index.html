@@ -98,7 +98,7 @@
     <div class="e-content article-entry" itemprop="articleBody">
       
         <h2 id="硬件介绍"><a href="#硬件介绍" class="headerlink" title="硬件介绍"></a>硬件介绍</h2><p>K230芯片大致框图如下，图源<a target="_blank" rel="noopener" href="https://kendryte-download.canaan-creative.com/developer/k230/HDK/K230%E7%A1%AC%E4%BB%B6%E6%96%87%E6%A1%A3/K230_Technical_Reference_Manual_V0.3.1_20241118.pdf">K230技术参考手册</a>：</p>
-<img src="assets/image-20251212164651116.png" alt="image-20251212164651116" style="zoom:67%;" />
+<img src="K230开发环境搭建/image-20251212195138057.png" alt="image-20251212195138057" style="zoom:50%;" />
 
 <p>核心是两颗玄铁RISC-V C908，一个800MHz的小核<code>cpu0</code>，1.6GHz的大核<code>cpu1</code>。嘉楠官方给了两种开发方式，第一种是小核<code>cpu0</code>跑Linux，大核<code>cpu1</code>跑rt-smart的异构架构，另一种是纯rt-smart架构，似乎只跑在大核上。由于多核通信很麻烦，我只用了rt-smart版本进行开发。</p>
 <h2 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h2><p>k230 rt-smart开发环境配置需要两套，一套是<code>rt-thread</code>主线内核，另一套是基础镜像。</p>
@@ -174,8 +174,7 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make menuconfig KCONFIG_CONFIG=Microsoft/config-wsl</span><br></pre></td></tr></table></figure>
 
 <p>然后再<code>menuconfig</code>中把<code>Device Drivers -&gt; USB support -&gt; USB Mass Storage support</code>下面全勾上就行了，记得打’*‘直接编译进内核，‘M’需要手动加载</p>
-<p><img src="/assets/image-20251212185635215.png" alt="image-20251212185635215"></p>
-<p>然后编译内核：</p>
+<p><img src="/K230%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/image-20251212195206242.png" alt="image-20251212195206242">然后编译内核：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make -j$(<span class="built_in">nproc</span>) bzImage KCONFIG_CONFIG=Microsoft/config-wsl</span><br></pre></td></tr></table></figure>
 
 <p>编译结束会在<code>arch/x86/boot/</code>下面生成名为<code>bzImage</code>的内核文件。</p>
@@ -188,7 +187,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2025/12/12/K230%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" data-id="cmj2sri9k0000o8uhb4fc8too" data-title="K230开发环境搭建" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      <a data-url="http://example.com/2025/12/12/K230%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" data-id="cmj2t4zcs00004kuha8u6745b" data-title="K230开发环境搭建" class="article-share-link"><span class="fa fa-share">Share</span></a>
       
       
       
