@@ -4,11 +4,11 @@
   
   
   <entry>
-    <title>K230 GNNE 驱动移植</title>
+    <title>K230 GNNE驱动移植</title>
     <link href="/2025/12/25/K230-GNNE%E9%A9%B1%E5%8A%A8%E7%A7%BB%E6%A4%8D/"/>
     <url>/2025/12/25/K230-GNNE%E9%A9%B1%E5%8A%A8%E7%A7%BB%E6%A4%8D/</url>
     
-    <content type="html"><![CDATA[]]></content>
+    <content type="html"><![CDATA[<h2 id="硬件平台"><a href="#硬件平台" class="headerlink" title="硬件平台"></a>硬件平台</h2><h2 id="驱动架构设计"><a href="#驱动架构设计" class="headerlink" title="驱动架构设计"></a>驱动架构设计</h2><h2 id="实现细节"><a href="#实现细节" class="headerlink" title="实现细节"></a>实现细节</h2>]]></content>
     
     
     <categories>
@@ -29,6 +29,39 @@
       <tag>bsp</tag>
       
       <tag>gnne</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>K230 SPI驱动移植</title>
+    <link href="/2025/12/18/K230-SPI%E9%A9%B1%E5%8A%A8%E7%A7%BB%E6%A4%8D/"/>
+    <url>/2025/12/18/K230-SPI%E9%A9%B1%E5%8A%A8%E7%A7%BB%E6%A4%8D/</url>
+    
+    <content type="html"><![CDATA[<h2 id="SPI协议简述"><a href="#SPI协议简述" class="headerlink" title="SPI协议简述"></a>SPI协议简述</h2><h2 id="硬件平台"><a href="#硬件平台" class="headerlink" title="硬件平台"></a>硬件平台</h2><h3 id="驱动架构设计"><a href="#驱动架构设计" class="headerlink" title="驱动架构设计"></a>驱动架构设计</h3><h2 id="实现细节"><a href="#实现细节" class="headerlink" title="实现细节"></a>实现细节</h2>]]></content>
+    
+    
+    <categories>
+      
+      <category>K230-rt-smart</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>K230</tag>
+      
+      <tag>rt-smart</tag>
+      
+      <tag>嵌入式</tag>
+      
+      <tag>bsp</tag>
+      
+      <tag>spi</tag>
       
     </tags>
     
@@ -58,39 +91,6 @@
       <tag>rt-smart</tag>
       
       <tag>嵌入式</tag>
-      
-    </tags>
-    
-  </entry>
-  
-  
-  
-  <entry>
-    <title>K230 spi驱动移植</title>
-    <link href="/2025/12/12/K230-SPI%E9%A9%B1%E5%8A%A8%E7%A7%BB%E6%A4%8D/"/>
-    <url>/2025/12/12/K230-SPI%E9%A9%B1%E5%8A%A8%E7%A7%BB%E6%A4%8D/</url>
-    
-    <content type="html"><![CDATA[<h2 id="SPI协议简述"><a href="#SPI协议简述" class="headerlink" title="SPI协议简述"></a>SPI协议简述</h2><h3 id="RT-thread-内核QSPI组件"><a href="#RT-thread-内核QSPI组件" class="headerlink" title="RT-thread 内核QSPI组件"></a>RT-thread 内核QSPI组件</h3><h2 id="K230-驱动编写"><a href="#K230-驱动编写" class="headerlink" title="K230 驱动编写"></a>K230 驱动编写</h2>]]></content>
-    
-    
-    <categories>
-      
-      <category>K230-rt-smart</category>
-      
-    </categories>
-    
-    
-    <tags>
-      
-      <tag>K230</tag>
-      
-      <tag>rt-smart</tag>
-      
-      <tag>嵌入式</tag>
-      
-      <tag>bsp</tag>
-      
-      <tag>spi</tag>
       
     </tags>
     
