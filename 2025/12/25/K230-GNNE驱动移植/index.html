@@ -208,7 +208,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          7.5k 字
+          7.6k 字
         
       </span>
     
@@ -320,28 +320,30 @@
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">static</span> <span class="hljs-type">void</span> <span class="hljs-title function_">irq_callback</span><span class="hljs-params">(<span class="hljs-type">int</span> irq, <span class="hljs-type">void</span> *data)</span><br>&#123;<br>    <span class="hljs-type">rt_wqueue_t</span> *wait = (<span class="hljs-type">rt_wqueue_t</span> *)data;<br>    <span class="hljs-keyword">volatile</span> <span class="hljs-type">void</span> *write_addr = (<span class="hljs-type">void</span> *)((<span class="hljs-type">char</span> *)gnne_base_addr + <span class="hljs-number">0x128</span>);<br>    <span class="hljs-keyword">if</span> (gnne_base_addr == RT_NULL)<br>    &#123;<br>        gnne_err(<span class="hljs-string">&quot;gnne interrupts while the hardware is not yet initialized\n&quot;</span>);<br>    &#125;<br>    <span class="hljs-comment">/*clear kpu intr*/</span><br>    __iowmb();<br>    *(<span class="hljs-type">rt_uint64_t</span> *)write_addr = <span class="hljs-number">0x400000004</span>;<br>    rt_wqueue_wakeup(wait, (<span class="hljs-type">void</span> *)POLLIN);<br>    rt_event_send(&amp;g_gnne_event, <span class="hljs-number">0x1</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>整体调用流程大致如下：</p>
-<pre class="mermaid">sequenceDiagram
+<pre><code class=" mermaid">sequenceDiagram
     participant User as 用户进程
     participant Poll as gnne_device_poll()
     participant Event as rt_event_recv()
     participant HW as GNNE 硬件
     participant IRQ as irq_callback()
     
-    User->>Poll: 调用 poll()
-    Poll->>Event: rt_event_recv() 阻塞等待
+    User-&gt;&gt;Poll: 调用 poll()
+    Poll-&gt;&gt;Event: rt_event_recv() 阻塞等待
     Note over Event: 等待事件 g_gnne_event
     
-    HW->>HW: 完成计算
-    HW->>IRQ: 触发中断
+    HW-&gt;&gt;HW: 完成计算
+    HW-&gt;&gt;IRQ: 触发中断
     
-    IRQ->>IRQ: 清除中断标志<br/>*(0x128) = 0x400000004
-    IRQ->>Event: rt_event_send(g_gnne_event)
+    IRQ-&gt;&gt;IRQ: 清除中断标志&lt;br/&gt;*(0x128) = 0x400000004
+    IRQ-&gt;&gt;Event: rt_event_send(g_gnne_event)
     Note over Event: 事件到达，唤醒
     
-    Event-->>Poll: 返回
-    Poll->>Poll: rt_poll_add() 注册等待队列
-    Poll-->>User: return POLLIN
-    Note over User: poll() 返回，数据可读</pre>
+    Event--&gt;&gt;Poll: 返回
+    Poll-&gt;&gt;Poll: rt_poll_add() 注册等待队列
+    Poll--&gt;&gt;User: return POLLIN
+    Note over User: poll() 返回，数据可读
+
+</code></pre>
 
 <p>需要注意的是，这个实现与标准的 poll 机制有所不同：</p>
 <ul>
