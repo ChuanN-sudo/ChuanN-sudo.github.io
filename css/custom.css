@@ -1,3 +1,10 @@
 .mermaid .code-widget {
   display: none !important;
 }
+.mermaid {
+  background: transparent !important;
+}
+
+.mermaid svg {
+  background: transparent !important;
+}
