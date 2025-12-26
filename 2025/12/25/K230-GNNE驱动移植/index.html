@@ -19,15 +19,17 @@
   <meta name="author" content="ChuanN">
   <meta name="keywords" content="">
   
-    <meta name="description" content="硬件平台驱动架构设计实现细节">
+    <meta name="description" content="硬件平台K230架构图如下：  黄框是AI Subsystem，里面包含了KPU、AI2D、FFT以及SRAM，这里我们只考虑KPU和AI2D。 GNNEGNNE，或者叫KPU，这两个在嘉楠手册的Memory Map中是同一个地址，也就是是同一个外设。 KPU用于实现神经网络算子，K230的KPU目前支持：int8和int16的卷积、池化，LSTM，RELU等算子以及一些矩阵运算。但是Solfma">
 <meta property="og:type" content="article">
 <meta property="og:title" content="K230 GNNE驱动移植">
 <meta property="og:url" content="https://chuann-sudo.github.io/2025/12/25/K230-GNNE%E9%A9%B1%E5%8A%A8%E7%A7%BB%E6%A4%8D/index.html">
 <meta property="og:site_name" content="Chuann&#39;s Blogs">
-<meta property="og:description" content="硬件平台驱动架构设计实现细节">
+<meta property="og:description" content="硬件平台K230架构图如下：  黄框是AI Subsystem，里面包含了KPU、AI2D、FFT以及SRAM，这里我们只考虑KPU和AI2D。 GNNEGNNE，或者叫KPU，这两个在嘉楠手册的Memory Map中是同一个地址，也就是是同一个外设。 KPU用于实现神经网络算子，K230的KPU目前支持：int8和int16的卷积、池化，LSTM，RELU等算子以及一些矩阵运算。但是Solfma">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://chuann-sudo.github.io/2025/12/25/K230-GNNE%E9%A9%B1%E5%8A%A8%E7%A7%BB%E6%A4%8D/image-20251226114205250.png">
+<meta property="og:image" content="https://chuann-sudo.github.io/2025/12/25/K230-GNNE%E9%A9%B1%E5%8A%A8%E7%A7%BB%E6%A4%8D/image-20251226173937361.png">
 <meta property="article:published_time" content="2025-12-25T15:30:57.000Z">
-<meta property="article:modified_time" content="2025-12-25T16:04:24.703Z">
+<meta property="article:modified_time" content="2025-12-26T09:42:23.639Z">
 <meta property="article:author" content="ChuanN">
 <meta property="article:tag" content="K230">
 <meta property="article:tag" content="rt-smart">
@@ -35,6 +37,7 @@
 <meta property="article:tag" content="bsp">
 <meta property="article:tag" content="gnne">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://chuann-sudo.github.io/2025/12/25/K230-GNNE%E9%A9%B1%E5%8A%A8%E7%A7%BB%E6%A4%8D/image-20251226114205250.png">
   
   
   
@@ -203,7 +206,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          14 字
+          812 字
         
       </span>
     
@@ -214,7 +217,7 @@
         
         
         
-          1 分钟
+          7 分钟
         
       </span>
     
@@ -256,7 +259,18 @@
             
               <div class="markdown-body">
                 
-                <h2 id="硬件平台"><a href="#硬件平台" class="headerlink" title="硬件平台"></a>硬件平台</h2><h2 id="驱动架构设计"><a href="#驱动架构设计" class="headerlink" title="驱动架构设计"></a>驱动架构设计</h2><h2 id="实现细节"><a href="#实现细节" class="headerlink" title="实现细节"></a>实现细节</h2>
+                <h2 id="硬件平台"><a href="#硬件平台" class="headerlink" title="硬件平台"></a>硬件平台</h2><p>K230架构图如下：</p>
+<p><img src="/2025/12/25/K230-GNNE%E9%A9%B1%E5%8A%A8%E7%A7%BB%E6%A4%8D/image-20251226114205250.png" alt="image-20251226114205250"></p>
+<p>黄框是AI Subsystem，里面包含了KPU、AI2D、FFT以及SRAM，这里我们只考虑KPU和AI2D。</p>
+<h3 id="GNNE"><a href="#GNNE" class="headerlink" title="GNNE"></a>GNNE</h3><p>GNNE，或者叫KPU，这两个在嘉楠手册的Memory Map中是同一个地址，也就是是同一个外设。</p>
+<p>KPU用于实现神经网络算子，K230的KPU目前支持：int8和int16的卷积、池化，LSTM，RELU等算子以及一些矩阵运算。但是Solfmax等算子还是得交给CPU进行计算。具体支持算子详见：<a target="_blank" rel="noopener" href="https://kendryte-download.canaan-creative.com/developer/k230/HDK/K230%E7%A1%AC%E4%BB%B6%E6%96%87%E6%A1%A3/K230_Technical_Reference_Manual_V0.3.1_20241118.pdf">K230技术参考手册</a>4.2 Function Description部分。</p>
+<h3 id="AI2D"><a href="#AI2D" class="headerlink" title="AI2D"></a>AI2D</h3><p>AI2D模块主要进行图像处理，可以对来自CPU或者KPU的数据进行缩放、仿射变化、裁剪、填充等。</p>
+<h2 id="驱动架构设计"><a href="#驱动架构设计" class="headerlink" title="驱动架构设计"></a>驱动架构设计</h2><p>查阅<a target="_blank" rel="noopener" href="https://kendryte-download.canaan-creative.com/developer/k230/HDK/K230%E7%A1%AC%E4%BB%B6%E6%96%87%E6%A1%A3/K230_Technical_Reference_Manual_V0.3.1_20241118.pdf">K230技术参考手册</a>，会发现一个问题，嘉楠并没有提供KPU的寄存器手册，和工程师沟通后，了解到GNNE的驱动分为两部分，一部分包含互斥锁以及轮询等待，另一部分由NNCASE实现，直接在用户态进行IO内存映射。因此，想完成在K230上运行yolo之类的神经网络模型，需要三部分：NNCASE、MMZ驱动、GNNE（KPU+AI2D）驱动。</p>
+<h3 id="NNCASE"><a href="#NNCASE" class="headerlink" title="NNCASE"></a>NNCASE</h3><p>NNCASE是嘉楠开发的神经网络编译器，支持CPU和KPU，AI2D作为一个子模块包含在里面的。nncase大致分为两部分，一个是编译器compiler和runtime。</p>
+<p>由于笔者在驱动移植过程中主要负责bsp部分，nncase并没有深入研究，使用方法详见：<a target="_blank" rel="noopener" href="https://www.kendryte.com/k230/dev/01_software/board/ai/K230_nncase_%E5%BC%80%E5%8F%91%E6%8C%87%E5%8D%97.html">K230 nncase开发指南</a>，嘉楠镜像中也有设计好的的demo：<a target="_blank" rel="noopener" href="https://www.kendryte.com/k230_rtos/zh/main/app_develop_guide/ai/index.html">AI 应用开发</a>，在<code>menuconfig</code>中<code>K230 SDK Project Configuration -&gt;RT-Smart Configuration -&gt; Enable build Rtsmart examples</code>中勾选即可：</p>
+<p><img src="/2025/12/25/K230-GNNE%E9%A9%B1%E5%8A%A8%E7%A7%BB%E6%A4%8D/image-20251226173937361.png" alt="image-20251226173937361"></p>
+<p>烧录后进入系统，<code>cd app/examples</code>进入工程目录执行对应历程的脚本或者elf即可。</p>
+<h3 id="MMZ驱动"><a href="#MMZ驱动" class="headerlink" title="MMZ驱动"></a>MMZ驱动</h3><h2 id="实现细节"><a href="#实现细节" class="headerlink" title="实现细节"></a>实现细节</h2>
                 
               </div>
             
