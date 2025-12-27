@@ -2,14 +2,19 @@
   display: none !important;
 }
 
-.mermaid {
-  margin: 1rem 0 !important;
-  padding: 0 !important;
-}
-
+/* 去掉容器和 svg 的背景 */
+.mermaid,
 .mermaid svg {
   display: block;
   margin: 0 auto;
   max-width: 100%;
   height: auto !important;
+  background: transparent !important;
 }
+
+/* 减少上下留白 */
+.mermaid {
+  margin: 1rem 0 !important;
+  padding: 0 !important;
+}
+
