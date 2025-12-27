@@ -1,34 +1,15 @@
 .mermaid .code-widget {
   display: none !important;
 }
+
 .mermaid {
   margin: 1rem 0 !important;
-  padding: 1rem !important;
-  border-radius: 8px;
+  padding: 0 !important;
 }
+
 .mermaid svg {
   display: block;
   margin: 0 auto;
   max-width: 100%;
   height: auto !important;
-}
-/* 亮色主题 */
-@media (prefers-color-scheme: light) {
-  .mermaid {
-    background: #f8f9fa !important;
-  }
-  
-  .mermaid svg {
-    background: #f8f9fa !important;
-  }
-}
-/* 暗色主题 */
-@media (prefers-color-scheme: dark) {
-  .mermaid {
-    background: #1e1e1e !important;
-  }
-  
-  .mermaid svg {
-    background: #1e1e1e !important;
-  }
 }
