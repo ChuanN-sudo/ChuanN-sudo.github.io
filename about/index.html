@@ -295,7 +295,7 @@
 
   <script>
   Fluid.utils.createScript('https://lib.baomitu.com/mermaid/8.14.0/mermaid.min.js', function() {
-    mermaid.initialize({"theme":"default"});
+    mermaid.initialize({"theme":"base","themeVariables":{"primaryColor":"#e3f2fd","primaryTextColor":"#1a1a1a","primaryBorderColor":"#90caf9","lineColor":"#64b5f6","secondaryColor":"#fff3e0","tertiaryColor":"#f1f8e9"}});
 
     Fluid.utils.listenDOMLoaded(function() {
       Fluid.events.registerRefreshCallback(function() {
