@@ -2,11 +2,7 @@
   display: none !important;
 }
 .mermaid {
-  background-color: transparent !important;
-}
-
-.mermaid svg {
-  background-color: transparent !important;
+  background: transparent !important;
 }
 
 
