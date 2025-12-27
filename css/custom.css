@@ -8,6 +8,7 @@
   background: transparent !important;
 }
 
-.mermaid > svg > rect:first-of-type {
+/* 去掉 mermaid 生成的白色背景矩形 */
+.mermaid svg > rect:first-child {
   fill: transparent !important;
 }
