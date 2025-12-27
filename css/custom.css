@@ -13,7 +13,7 @@
   height: auto !important;
 }
 /* 亮色主题 */
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
   .mermaid {
     background: #f8f9fa !important;
   }
@@ -23,7 +23,7 @@
   }
 }
 /* 暗色主题 */
-@media (prefers-color-scheme: light) {
+@media (prefers-color-scheme: dark) {
   .mermaid {
     background: #1e1e1e !important;
   }
