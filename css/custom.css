@@ -12,12 +12,60 @@
   background: transparent !important;
 }
 
-/* 去掉 mermaid 生成的白色背景矩形 */
-.mermaid svg > rect:first-child {
-  fill: transparent !important;
-}
 /* 减少上下留白 */
 .mermaid {
   margin: 1rem 0 !important;
   padding: 0 !important;
+}
+
+
+/* 亮色主题配色 */
+@media (prefers-color-scheme: light) {
+  .mermaid svg {
+    background: #f8f9fa !important;
+  }
+  
+  .mermaid svg .node rect,
+  .mermaid svg .node circle,
+  .mermaid svg .node polygon {
+    fill: #e3f2fd !important;
+    stroke: #2196f3 !important;
+    stroke-width: 2px !important;
+  }
+  
+  .mermaid svg .node .label {
+    color: #1a1a1a !important;
+  }
+  
+  .mermaid svg .edgeLabel {
+    background-color: #ffffff !important;
+    color: #424242 !important;
+  }
+}
+/* 暗色主题配色 */
+@media (prefers-color-scheme: dark) {
+  .mermaid svg {
+    background: #1e1e1e !important;
+  }
+  
+  .mermaid svg .node rect,
+  .mermaid svg .node circle,
+  .mermaid svg .node polygon {
+    fill: #2d3748 !important;
+    stroke: #4299e1 !important;
+    stroke-width: 2px !important;
+  }
+  
+  .mermaid svg .node .label {
+    color: #e2e8f0 !important;
+  }
+  
+  .mermaid svg .edgeLabel {
+    background-color: #2d3748 !important;
+    color: #cbd5e0 !important;
+  }
+  
+  .mermaid svg .edgePath .path {
+    stroke: #4299e1 !important;
+  }
 }
