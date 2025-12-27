@@ -2,13 +2,17 @@
   display: none !important;
 }
 
-/* 去掉容器和 svg 的背景 */
-.mermaid,
-.mermaid svg {
+.mermaid svg,
+.mermaid svg rect {
   background: transparent !important;
-}
-
-/* 去掉 mermaid 生成的白色背景矩形 */
-.mermaid svg > rect:first-child {
   fill: transparent !important;
+}
+/* 只让图表元素保持原色 */
+.mermaid svg .actor,
+.mermaid svg .messageText,
+.mermaid svg text,
+.mermaid svg path,
+.mermaid svg line,
+.mermaid svg circle {
+  fill: inherit !important;
 }
