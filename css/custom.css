@@ -9,7 +9,7 @@
   margin: 0 auto;
   max-width: 100%;
   height: auto !important;
-  background: #ffffff !important;
+  background: transparent !important;
 }
 
 /* 减少上下留白 */
