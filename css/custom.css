@@ -12,3 +12,14 @@
 .mermaid svg > rect:first-child {
   fill: transparent !important;
 }
+/* 减少上下留白 */
+.mermaid {
+  margin: 1rem 0 !important;
+  padding: 0 !important;
+}
+.mermaid svg {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto !important;
+}
