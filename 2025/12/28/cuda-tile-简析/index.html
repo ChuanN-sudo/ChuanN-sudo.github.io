@@ -19,21 +19,34 @@
   <meta name="author" content="ChuanN">
   <meta name="keywords" content="">
   
-    <meta property="og:type" content="website">
-<meta property="og:title" content="Chuann&#39;s Blogs">
-<meta property="og:url" content="https://chuann-sudo.github.io/index.html">
+    <meta name="description" content="Nvidia开源了cuda-tile](https:&#x2F;&#x2F;github.com&#x2F;NVIDIA&#x2F;cuda-tile)，正好写一个技术博客看看实现细节。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="cuda-tile 简析">
+<meta property="og:url" content="https://chuann-sudo.github.io/2025/12/28/cuda-tile-%E7%AE%80%E6%9E%90/index.html">
 <meta property="og:site_name" content="Chuann&#39;s Blogs">
+<meta property="og:description" content="Nvidia开源了cuda-tile](https:&#x2F;&#x2F;github.com&#x2F;NVIDIA&#x2F;cuda-tile)，正好写一个技术博客看看实现细节。">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-12-28T13:46:19.000Z">
+<meta property="article:modified_time" content="2025-12-28T13:59:22.257Z">
 <meta property="article:author" content="ChuanN">
+<meta property="article:tag" content="CUDA">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="GPU">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>Chuann&#39;s Blogs</title>
+  <title>cuda-tile 简析 - Chuann&#39;s Blogs</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
 
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
 
 
@@ -163,15 +176,55 @@
   
 
 <div id="banner" class="banner" parallax=true
-     style="background: url('/img/6_BlackHole3x_4k_a7481.jpg') no-repeat center center; background-size: cover;">
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
   <div class="full-bg-img">
     <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="悲喜总无泪也，是人间白发，剑胆成灰"></span>
+            <span id="subtitle" data-typed-text="cuda-tile 简析"></span>
           
         </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-12-28 21:46" pubdate>
+          2025年12月28日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          73 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          1 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
 
         
       </div>
@@ -187,297 +240,182 @@
 
   <main>
     
-      <div class="container nopadding-x-md">
-        <div id="board"
-          >
-          
-          <div class="container">
-            <div class="row">
-              <div class="col-12 col-md-10 m-auto">
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">cuda-tile 简析</h1>
+            
+            
+              <div class="markdown-body">
                 
+                <p>Nvidia开源了cuda-tile](<a href="https://github.com/NVIDIA/cuda-tile)%EF%BC%8C%E6%AD%A3%E5%A5%BD%E5%86%99%E4%B8%80%E4%B8%AA%E6%8A%80%E6%9C%AF%E5%8D%9A%E5%AE%A2%E7%9C%8B%E7%9C%8B%E5%AE%9E%E7%8E%B0%E7%BB%86%E8%8A%82%E3%80%82">https://github.com/NVIDIA/cuda-tile)，正好写一个技术博客看看实现细节。</a></p>
 
-<h1 style="display: none">Chuann&#39;s Blogs</h1>
-
-  <div class="row mx-auto index-card">
-    
-    
-      <div class="col-12 col-md-4 m-auto index-img">
-        <a href="/2025/12/28/cuda-tile-%E7%AE%80%E6%9E%90/" target="_self">
-          <img src="/img/Mahina2_4k.jpg" alt="cuda-tile 简析">
-        </a>
-      </div>
-    
-    <article class="col-12 col-md-8 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2025/12/28/cuda-tile-%E7%AE%80%E6%9E%90/" target="_self">
-          cuda-tile 简析
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt " href="/2025/12/28/cuda-tile-%E7%AE%80%E6%9E%90/" target="_self">
-        <div>
-          Nvidia开源了cuda-tile](https://github.com/NVIDIA/cuda-tile)，正好写一个技术博客看看实现细节。
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2025-12-28 21:46" pubdate>
-              2025-12-28
-            </time>
-          </div>
-        
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/CUDA/">#CUDA</a>
-            
-              <a href="/tags/AI/">#AI</a>
-            
-              <a href="/tags/GPU/">#GPU</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-      <div class="col-12 col-md-4 m-auto index-img">
-        <a href="/2025/12/25/K230-GNNE%E9%A9%B1%E5%8A%A8%E7%A7%BB%E6%A4%8D/" target="_self">
-          <img src="/img/Mahina2_4k.jpg" alt="K230-GNNE驱动移植">
-        </a>
-      </div>
-    
-    <article class="col-12 col-md-8 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2025/12/25/K230-GNNE%E9%A9%B1%E5%8A%A8%E7%A7%BB%E6%A4%8D/" target="_self">
-          K230-GNNE驱动移植
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt " href="/2025/12/25/K230-GNNE%E9%A9%B1%E5%8A%A8%E7%A7%BB%E6%A4%8D/" target="_self">
-        <div>
-          硬件平台K230架构图如下：  黄框是AI Subsystem，里面包含了KPU、AI2D、FFT以及SRAM，这里我们只考虑KPU和AI2D。 GNNEGNNE，或者叫KPU，这两个在嘉楠手册的Memory Map中是同一个地址，也就是是同一个外设。 KPU用于实现神经网络算子，K230的KPU目前支持：int8和int16的卷积、池化，LSTM，RELU等算子以及一些矩阵运算。但是Solfma
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2025-12-25 23:30" pubdate>
-              2025-12-25
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/K230-rt-smart/" class="category-chain-item">K230-rt-smart</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/K230/">#K230</a>
-            
-              <a href="/tags/rt-smart/">#rt-smart</a>
-            
-              <a href="/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/">#嵌入式</a>
-            
-              <a href="/tags/bsp/">#bsp</a>
-            
-              <a href="/tags/gnne/">#gnne</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-      <div class="col-12 col-md-4 m-auto index-img">
-        <a href="/2025/12/18/K230-SPI%E9%A9%B1%E5%8A%A8%E7%A7%BB%E6%A4%8D/" target="_self">
-          <img src="/img/Mahina2_4k.jpg" alt="K230-SPI驱动移植">
-        </a>
-      </div>
-    
-    <article class="col-12 col-md-8 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2025/12/18/K230-SPI%E9%A9%B1%E5%8A%A8%E7%A7%BB%E6%A4%8D/" target="_self">
-          K230-SPI驱动移植
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt " href="/2025/12/18/K230-SPI%E9%A9%B1%E5%8A%A8%E7%A7%BB%E6%A4%8D/" target="_self">
-        <div>
-          SPI协议简述标准SPISPI（Serial Peripheral Interface）是一种高速、全双工的同步串行通信协议，广泛应用于微控制器与外设（如Flash、传感器、显示屏）之间的通信。 核心特性：  4线接口：SCLK（时钟）、CS（片选）、MOSI（主出从入）、MISO（主入从出）。 全双工通信：主从设备可同时收发数据。 主从模式：主设备控制时钟和片选，从设备响应。 高速传输：时钟频率
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2025-12-18 18:51" pubdate>
-              2025-12-18
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/K230-rt-smart/" class="category-chain-item">K230-rt-smart</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/K230/">#K230</a>
-            
-              <a href="/tags/rt-smart/">#rt-smart</a>
-            
-              <a href="/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/">#嵌入式</a>
-            
-              <a href="/tags/bsp/">#bsp</a>
-            
-              <a href="/tags/spi/">#spi</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-      <div class="col-12 col-md-4 m-auto index-img">
-        <a href="/2025/12/12/K230-%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" target="_self">
-          <img src="/img/Mahina2_4k.jpg" alt="K230-开发环境搭建">
-        </a>
-      </div>
-    
-    <article class="col-12 col-md-8 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2025/12/12/K230-%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" target="_self">
-          K230-开发环境搭建
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt " href="/2025/12/12/K230-%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" target="_self">
-        <div>
-          硬件介绍K230芯片大致框图如下，图源K230技术参考手册  核心是两颗玄铁RISC-V C908，一个800MHz的小核cpu0，1.6GHz的大核cpu1。嘉楠官方给了两种开发方式，第一种是小核cpu0跑Linux，大核cpu1跑rt-smart的异构架构，另一种是纯rt-smart架构，似乎只跑在大核上。由于多核通信很麻烦，我只用了rt-smart版本进行开发。 环境搭建k230 rt-sm
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2025-12-12 16:35" pubdate>
-              2025-12-12
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/K230-rt-smart/" class="category-chain-item">K230-rt-smart</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/K230/">#K230</a>
-            
-              <a href="/tags/rt-smart/">#rt-smart</a>
-            
-              <a href="/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/">#嵌入式</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-
-
-
-
+                
               </div>
-            </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/CUDA/" class="print-no-link">#CUDA</a>
+      
+        <a href="/tags/AI/" class="print-no-link">#AI</a>
+      
+        <a href="/tags/GPU/" class="print-no-link">#GPU</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>cuda-tile 简析</div>
+      <div>https://chuann-sudo.github.io/2025/12/28/cuda-tile-简析/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>ChuanN</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年12月28日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
           </div>
         </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/12/25/K230-GNNE%E9%A9%B1%E5%8A%A8%E7%A7%BB%E6%A4%8D/" title="K230-GNNE驱动移植">
+                        <span class="hidden-mobile">K230-GNNE驱动移植</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
       </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  <script>
+  Fluid.utils.createScript('https://lib.baomitu.com/mermaid/8.14.0/mermaid.min.js', function() {
+    mermaid.initialize({"theme":"default"});
+
+    Fluid.utils.listenDOMLoaded(function() {
+      Fluid.events.registerRefreshCallback(function() {
+        if ('mermaid' in window) {
+          mermaid.init();
+        }
+      });
+    });
+  });
+</script>
+
+
+
+
+
+
     
 
     
@@ -573,6 +511,99 @@
 
 
 
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
 
   <script  src="/js/local-search.js" ></script>
 
