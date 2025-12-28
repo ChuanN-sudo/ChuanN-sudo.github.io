@@ -19,15 +19,19 @@
   <meta name="author" content="ChuanN">
   <meta name="keywords" content="">
   
-    <meta name="description" content="SPI协议简述硬件平台驱动架构设计实现细节">
+    <meta name="description" content="SPI协议简述SPI（Serial Peripheral Interface）是一种高速、全双工的同步串行通信协议，广泛应用于微控制器与外设（如Flash、传感器、显示屏）之间的通信。 核心特性：  4线接口：SCLK（时钟）、CS（片选）、MOSI（主出从入）、MISO（主入从出）。 全双工通信：主从设备可同时收发数据。 主从模式：主设备控制时钟和片选，从设备响应。 高速传输：时钟频率可达数十M">
 <meta property="og:type" content="article">
 <meta property="og:title" content="K230-SPI驱动移植">
 <meta property="og:url" content="https://chuann-sudo.github.io/2025/12/18/K230-SPI%E9%A9%B1%E5%8A%A8%E7%A7%BB%E6%A4%8D/index.html">
 <meta property="og:site_name" content="Chuann&#39;s Blogs">
-<meta property="og:description" content="SPI协议简述硬件平台驱动架构设计实现细节">
+<meta property="og:description" content="SPI协议简述SPI（Serial Peripheral Interface）是一种高速、全双工的同步串行通信协议，广泛应用于微控制器与外设（如Flash、传感器、显示屏）之间的通信。 核心特性：  4线接口：SCLK（时钟）、CS（片选）、MOSI（主出从入）、MISO（主入从出）。 全双工通信：主从设备可同时收发数据。 主从模式：主设备控制时钟和片选，从设备响应。 高速传输：时钟频率可达数十M">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://chuann-sudo.github.io/2025/12/18/K230-SPI%E9%A9%B1%E5%8A%A8%E7%A7%BB%E6%A4%8D/image-20251228001533771.png">
+<meta property="og:image" content="https://chuann-sudo.github.io/2025/12/18/K230-SPI%E9%A9%B1%E5%8A%A8%E7%A7%BB%E6%A4%8D/image-20251228002119199.png">
+<meta property="og:image" content="https://chuann-sudo.github.io/2025/12/18/K230-SPI%E9%A9%B1%E5%8A%A8%E7%A7%BB%E6%A4%8D/image-20251228190734725.png">
+<meta property="og:image" content="https://chuann-sudo.github.io/2025/12/18/K230-SPI%E9%A9%B1%E5%8A%A8%E7%A7%BB%E6%A4%8D/image-20251226114205250.png">
 <meta property="article:published_time" content="2025-12-18T10:51:24.000Z">
-<meta property="article:modified_time" content="2025-12-27T11:29:52.407Z">
+<meta property="article:modified_time" content="2025-12-28T11:14:54.475Z">
 <meta property="article:author" content="ChuanN">
 <meta property="article:tag" content="K230">
 <meta property="article:tag" content="rt-smart">
@@ -35,6 +39,7 @@
 <meta property="article:tag" content="bsp">
 <meta property="article:tag" content="spi">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://chuann-sudo.github.io/2025/12/18/K230-SPI%E9%A9%B1%E5%8A%A8%E7%A7%BB%E6%A4%8D/image-20251228001533771.png">
   
   
   
@@ -207,7 +212,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          21 字
+          1.2k 字
         
       </span>
     
@@ -218,7 +223,7 @@
         
         
         
-          1 分钟
+          11 分钟
         
       </span>
     
@@ -260,7 +265,83 @@
             
               <div class="markdown-body">
                 
-                <h2 id="SPI协议简述"><a href="#SPI协议简述" class="headerlink" title="SPI协议简述"></a>SPI协议简述</h2><h2 id="硬件平台"><a href="#硬件平台" class="headerlink" title="硬件平台"></a>硬件平台</h2><h2 id="驱动架构设计"><a href="#驱动架构设计" class="headerlink" title="驱动架构设计"></a>驱动架构设计</h2><h2 id="实现细节"><a href="#实现细节" class="headerlink" title="实现细节"></a>实现细节</h2>
+                <h2 id="SPI协议简述"><a href="#SPI协议简述" class="headerlink" title="SPI协议简述"></a>SPI协议简述</h2><p>SPI（Serial Peripheral Interface）是一种高速、全双工的同步串行通信协议，广泛应用于微控制器与外设（如Flash、传感器、显示屏）之间的通信。</p>
+<p><strong>核心特性：</strong></p>
+<ul>
+<li><strong>4线接口</strong>：SCLK（时钟）、CS（片选）、MOSI（主出从入）、MISO（主入从出）。</li>
+<li><strong>全双工通信</strong>：主从设备可同时收发数据。</li>
+<li><strong>主从模式</strong>：主设备控制时钟和片选，从设备响应。</li>
+<li><strong>高速传输</strong>：时钟频率可达数十MHz。</li>
+</ul>
+<p>标准SPI时序如下(CPOL &#x3D; 1，CPHA &#x3D; 0)：</p>
+<p><img src="/2025/12/18/K230-SPI%E9%A9%B1%E5%8A%A8%E7%A7%BB%E6%A4%8D/image-20251228001533771.png" alt="标准SPI时序图"></p>
+<p>注:图中并没有标出时序建立时间，例如，这些详细要求参考芯片手册</p>
+<ul>
+<li>$t_{CSS}$: CS建立时间（CS下降沿到第一个时钟上升沿）</li>
+<li>$t_{CSH}$: CS保持时间（最后时钟下降沿到CS上升沿）</li>
+<li>$t_{SU}$: 数据建立时间（数据稳定到时钟采样沿）</li>
+<li>$t_{H}$: 数据保持时间（时钟采样沿后数据保持稳定）</li>
+</ul>
+<p>SPI有4种工作模式，由两个参数决定：</p>
+<ul>
+<li><strong>CPOL（时钟极性）</strong>：空闲时时钟线的电平（0&#x3D;低电平，1&#x3D;高电平）</li>
+<li><strong>CPHA（时钟相位）</strong>：数据采样时刻（0&#x3D;第一个边沿，1&#x3D;第二个边沿）</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="left">模式</th>
+<th align="left">CPOL</th>
+<th align="left">CPHA</th>
+<th align="left">空闲时钟</th>
+<th align="left">采样边沿</th>
+<th align="left">输出边沿</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">0</td>
+<td align="left">0</td>
+<td align="left">0</td>
+<td align="left">低电平</td>
+<td align="left">上升沿</td>
+<td align="left">下降沿</td>
+</tr>
+<tr>
+<td align="left">1</td>
+<td align="left">0</td>
+<td align="left">1</td>
+<td align="left">低电平</td>
+<td align="left">下降沿</td>
+<td align="left">上升沿</td>
+</tr>
+<tr>
+<td align="left">2</td>
+<td align="left">1</td>
+<td align="left">0</td>
+<td align="left">高电平</td>
+<td align="left">下降沿</td>
+<td align="left">上升沿</td>
+</tr>
+<tr>
+<td align="left">3</td>
+<td align="left">1</td>
+<td align="left">1</td>
+<td align="left">高电平</td>
+<td align="left">上升沿</td>
+<td align="left">下降沿</td>
+</tr>
+</tbody></table>
+<p><strong>模式0和模式3最常用</strong>，大多数SPI设备支持其中之一。主从设备必须使用相同的模式才能正常通信。</p>
+<p>详细时序如下(时钟建立时间不准)</p>
+<p><img src="/2025/12/18/K230-SPI%E9%A9%B1%E5%8A%A8%E7%A7%BB%E6%A4%8D/image-20251228002119199.png" alt="SPI工作模式"></p>
+<p>标准SPI虽然简单可靠，但在现代应用中面临明显的带宽瓶颈。由于采用单线传输方式，MOSI和MISO各占一根线进行半双工数据传输，即使时钟频率达到50MHz，单线传输速率也仅有6.25MB&#x2F;s。这在大容量Flash应用中尤为突出：从128MB Flash读取1MB数据需要约160ms，系统启动时加载数MB固件会产生明显延迟，而实时应用（如视频、图像处理）更是无法满足带宽需求。</p>
+<p>一个最简单的办法是增加时钟线，因此诞生了Dual SPI(双线)、Quad SPI(四线)以及Octal SPI(8线)。标准SPI采用全双工设计，MOSI和MISO是独立的单向线路，可同时收发数据。而DSPI&#x2F;QSPI&#x2F;OSPI采用半双工设计，数据线是双向复用的，同一时刻只能进行读或写操作。这种设计牺牲了全双工能力，但通过增加并行数据线大幅提升了单向传输带宽。</p>
+<p>三种增强型SPI协议传输可以分成三个阶段：命令、地址、数据，以QSPI为例，其传输时序为：</p>
+<p><img src="/2025/12/18/K230-SPI%E9%A9%B1%E5%8A%A8%E7%A7%BB%E6%A4%8D/image-20251228190734725.png" alt="QSPI发送模式"></p>
+<p>图中，命令为4bit，单线传输；地址和数据都是8bit，4线传输。实际上，命令线和地址线豆科鱼用1&#x2F;2&#x2F;4&#x2F;8线传输(也就是向下兼容)，或者省略，进行数据阶段的传输。</p>
+<h2 id="硬件平台"><a href="#硬件平台" class="headerlink" title="硬件平台"></a>硬件平台</h2><p>从K230芯片架构可以看出，K230有一个Octal SPI控制器(OPI)和两个Quad SPI控制器(QPI)。</p>
+<p><img src="/2025/12/18/K230-SPI%E9%A9%B1%E5%8A%A8%E7%A7%BB%E6%A4%8D/image-20251226114205250.png" alt="K230芯片架构"></p>
+<h2 id="驱动架构设计"><a href="#驱动架构设计" class="headerlink" title="驱动架构设计"></a>驱动架构设计</h2><h2 id="实现细节"><a href="#实现细节" class="headerlink" title="实现细节"></a>实现细节</h2>
                 
               </div>
             
