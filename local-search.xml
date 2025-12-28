@@ -8,7 +8,7 @@
     <link href="/2025/12/28/cuda-tile-%E7%AE%80%E6%9E%90/"/>
     <url>/2025/12/28/cuda-tile-%E7%AE%80%E6%9E%90/</url>
     
-    <content type="html"><![CDATA[<p>Nvidia开源了cuda-tile](<a href="https://github.com/NVIDIA/cuda-tile)%EF%BC%8C%E6%AD%A3%E5%A5%BD%E5%86%99%E4%B8%80%E4%B8%AA%E6%8A%80%E6%9C%AF%E5%8D%9A%E5%AE%A2%E7%9C%8B%E7%9C%8B%E5%AE%9E%E7%8E%B0%E7%BB%86%E8%8A%82%E3%80%82">https://github.com/NVIDIA/cuda-tile)，正好写一个技术博客看看实现细节。</a></p>]]></content>
+    <content type="html"><![CDATA[<p>Nvidia开源了<a href="https://github.com/NVIDIA/cuda-tile">cuda-tile</a>，正好写一个技术博客看看实现细节。</p>]]></content>
     
     
     
