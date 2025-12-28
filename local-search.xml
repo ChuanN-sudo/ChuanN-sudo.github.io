@@ -11,6 +11,12 @@
     <content type="html"><![CDATA[<p>Nvidia开源了<a href="https://github.com/NVIDIA/cuda-tile">cuda-tile</a>，正好写一个技术博客看看实现细节。</p>]]></content>
     
     
+    <categories>
+      
+      <category>AI</category>
+      
+    </categories>
+    
     
     <tags>
       
