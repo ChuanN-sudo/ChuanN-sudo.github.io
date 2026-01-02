@@ -19,24 +19,30 @@
   <meta name="author" content="ChuanN">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Nvidia开源了cuda-tile，正好写一个技术博客看看实现细节。">
+    <meta name="description" content="前言最近由于项目和自己整的一些小玩意的要求，需要频繁做ppt，但是笔者又没什么审美，做出来的很难看，格式反复改，经常出现一个PPT做两天的情况😭。而我自己审美本身就是一坨，经常出现改了好几天还是很丑。 那么，有没有什么办法把我们从这种状况下解救出来呢🧐，溜github的时候看到了这个玩意：marp  很好，写markdown这活我很熟了。正巧这玩意还有对应的VS Code插件：  基本使用我们">
 <meta property="og:type" content="article">
-<meta property="og:title" content="cuda-tile 简析">
-<meta property="og:url" content="https://chuann-sudo.github.io/2025/12/28/cuda-tile-%E7%AE%80%E6%9E%90/index.html">
+<meta property="og:title" content="使用marp生成ppt">
+<meta property="og:url" content="https://chuann-sudo.github.io/2026/01/01/%E4%BD%BF%E7%94%A8marp%E7%94%9F%E6%88%90ppt/index.html">
 <meta property="og:site_name" content="Chuann&#39;s Blogs">
-<meta property="og:description" content="Nvidia开源了cuda-tile，正好写一个技术博客看看实现细节。">
+<meta property="og:description" content="前言最近由于项目和自己整的一些小玩意的要求，需要频繁做ppt，但是笔者又没什么审美，做出来的很难看，格式反复改，经常出现一个PPT做两天的情况😭。而我自己审美本身就是一坨，经常出现改了好几天还是很丑。 那么，有没有什么办法把我们从这种状况下解救出来呢🧐，溜github的时候看到了这个玩意：marp  很好，写markdown这活我很熟了。正巧这玩意还有对应的VS Code插件：  基本使用我们">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2025-12-28T13:46:19.000Z">
-<meta property="article:modified_time" content="2025-12-28T14:46:02.862Z">
+<meta property="og:image" content="https://chuann-sudo.github.io/2026/01/01/%E4%BD%BF%E7%94%A8marp%E7%94%9F%E6%88%90ppt/image-20260102193815610.png">
+<meta property="og:image" content="https://chuann-sudo.github.io/2026/01/01/%E4%BD%BF%E7%94%A8marp%E7%94%9F%E6%88%90ppt/image-20260102193928665.png">
+<meta property="og:image" content="https://chuann-sudo.github.io/2026/01/01/%E4%BD%BF%E7%94%A8marp%E7%94%9F%E6%88%90ppt/image-20260102195553136.png">
+<meta property="og:image" content="https://chuann-sudo.github.io/2026/01/01/%E4%BD%BF%E7%94%A8marp%E7%94%9F%E6%88%90ppt/image-20260102195641735.png">
+<meta property="og:image" content="https://chuann-sudo.github.io/2026/01/01/%E4%BD%BF%E7%94%A8marp%E7%94%9F%E6%88%90ppt/image-20260102201751836.png">
+<meta property="article:published_time" content="2026-01-01T12:02:01.000Z">
+<meta property="article:modified_time" content="2026-01-02T12:21:31.144Z">
 <meta property="article:author" content="ChuanN">
-<meta property="article:tag" content="CUDA">
-<meta property="article:tag" content="AI">
-<meta property="article:tag" content="GPU">
+<meta property="article:tag" content="自动化">
+<meta property="article:tag" content="ppt">
+<meta property="article:tag" content="妙妙工具">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://chuann-sudo.github.io/2026/01/01/%E4%BD%BF%E7%94%A8marp%E7%94%9F%E6%88%90ppt/image-20260102193815610.png">
   
   
   
-  <title>cuda-tile 简析 - Chuann&#39;s Blogs</title>
+  <title>使用marp生成ppt - Chuann&#39;s Blogs</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -182,7 +188,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="cuda-tile 简析"></span>
+            <span id="subtitle" data-typed-text="使用marp生成ppt"></span>
           
         </div>
 
@@ -193,8 +199,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-12-28 21:46" pubdate>
-          2025年12月28日 晚上
+        <time datetime="2026-01-01 20:02" pubdate>
+          2026年1月1日 晚上
         </time>
       </span>
     
@@ -205,7 +211,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          35 字
+          1k 字
         
       </span>
     
@@ -216,7 +222,7 @@
         
         
         
-          1 分钟
+          9 分钟
         
       </span>
     
@@ -253,12 +259,31 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">cuda-tile 简析</h1>
+            <h1 id="seo-header">使用marp生成ppt</h1>
             
             
               <div class="markdown-body">
                 
-                <p>Nvidia开源了<a href="https://github.com/NVIDIA/cuda-tile">cuda-tile</a>，正好写一个技术博客看看实现细节。</p>
+                <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>最近由于项目和自己整的一些小玩意的要求，需要频繁做ppt，但是笔者又没什么审美，做出来的很难看，格式反复改，经常出现一个PPT做两天的情况😭。而我自己审美本身就是一坨，经常出现改了好几天还是很丑。</p>
+<p>那么，有没有什么办法把我们从这种状况下解救出来呢🧐，溜github的时候看到了这个玩意：<a href="https://github.com/marp-team/marp">marp</a></p>
+<p><img src="/2026/01/01/%E4%BD%BF%E7%94%A8marp%E7%94%9F%E6%88%90ppt/image-20260102193815610.png" alt="marp GitHub页面"></p>
+<p>很好，写markdown这活我很熟了。正巧这玩意还有对应的VS Code插件：</p>
+<p><img src="/2026/01/01/%E4%BD%BF%E7%94%A8marp%E7%94%9F%E6%88%90ppt/image-20260102193928665.png" alt="Marp for VS Code"></p>
+<h2 id="基本使用"><a href="#基本使用" class="headerlink" title="基本使用"></a>基本使用</h2><p>我们在VS code里面写几行小代码：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs markdown">---<br>marp: true<br>title: 个人汇报<br>paginate: true<br><span class="hljs-section">theme: uncover</span><br><span class="hljs-section">---</span><br><span class="hljs-section"># XXX 工作汇报</span><br><span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">br</span>/&gt;</span></span><br><span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">br</span>/&gt;</span></span><br><span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">br</span>/&gt;</span></span><br><br><span class="hljs-bullet">-</span> 汇报人：Chuann<br><span class="hljs-section">- 日期：2025-1-2</span><br><span class="hljs-section">---</span><br><span class="hljs-section">## 工作总览</span><br><span class="hljs-bullet">-</span> 方向：负责XXXXX 的XXXXX工作<br><span class="hljs-bullet">-</span> 主要工作：<br><span class="hljs-bullet">  -</span> XXX项目硬件电路问题排查<br><span class="hljs-bullet">  -</span> XXXX实验方案设计<br><span class="hljs-bullet">  -</span> 为XXX模块新增了XXXX功能<br><br>---<br><span class="hljs-section"># <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">big</span>&gt;</span></span><span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">center</span> <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;font-size: 200px;&quot;</span>&gt;</span></span> 谢谢！<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">center</span>&gt;</span></span><span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">big</span>&gt;</span></span></span><br>&lt;!---<br>谢谢大家。<br>---&gt;<br></code></pre></td></tr></table></figure>
+
+<p>代码里面，<code>---</code>是ppt的分页命令，开头是一些配置设置，主题什么的，其他写法和markdown一样，也支持嵌入html语法。</p>
+<p>然后我们点这个按钮，打开实时预览：</p>
+<p><img src="/2026/01/01/%E4%BD%BF%E7%94%A8marp%E7%94%9F%E6%88%90ppt/image-20260102195553136.png" alt="打开实时预览"></p>
+<p>右侧就能看到实时渲染的ppt了</p>
+<p><img src="/2026/01/01/%E4%BD%BF%E7%94%A8marp%E7%94%9F%E6%88%90ppt/image-20260102195641735.png" alt="实时渲染ppt"></p>
+<p>比如我用html语法塞一张图片进去(markdown自己的图片插入语法也行，但我用html多一些)：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs markdown"><br><span class="hljs-section">## 工作总览</span><br><span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;image.png&quot;</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;400&quot;</span> <span class="hljs-attr">align</span>=<span class="hljs-string">&quot;right&quot;</span> <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;margin-right: 20px;&quot;</span>&gt;</span></span><br><br><span class="hljs-bullet">-</span> 方向：负责XXXXX 的XXXXX工作<br><span class="hljs-bullet">-</span> 主要工作：<br><span class="hljs-bullet">  -</span> XXX项目硬件电路问题排查<br><span class="hljs-bullet">  -</span> XXXX实验方案设计<br><span class="hljs-bullet">  -</span> 为XXX模块新增了XXXX功能<br><br></code></pre></td></tr></table></figure>
+
+<p>渲染出来是这样的：</p>
+<p><img src="/2026/01/01/%E4%BD%BF%E7%94%A8marp%E7%94%9F%E6%88%90ppt/image-20260102201751836.png" alt="插入图片"></p>
+<p>基本的用法就是这种，这么看，用marp还是要写代码，对于不熟悉markdown的朋友并不友好🤔。但是笔者认为marp这里代码生成ppt的工具，其最大价值主要是可以使用ai生成了，流程熟悉以后抽AI鞭子就行了🤓。</p>
+<h3 id="进阶用法"><a href="#进阶用法" class="headerlink" title="进阶用法"></a>进阶用法</h3><p>待续，后续会补充自定义主题以及导入主题，设置背景等用法</p>
 
                 
               </div>
@@ -277,7 +302,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/AI/" class="category-chain-item">AI</a>
+  <a href="/categories/%E5%A6%99%E5%A6%99%E5%B7%A5%E5%85%B7/" class="category-chain-item">妙妙工具</a>
   
   
 
@@ -292,11 +317,11 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/CUDA/" class="print-no-link">#CUDA</a>
+        <a href="/tags/%E8%87%AA%E5%8A%A8%E5%8C%96/" class="print-no-link">#自动化</a>
       
-        <a href="/tags/AI/" class="print-no-link">#AI</a>
+        <a href="/tags/ppt/" class="print-no-link">#ppt</a>
       
-        <a href="/tags/GPU/" class="print-no-link">#GPU</a>
+        <a href="/tags/%E5%A6%99%E5%A6%99%E5%B7%A5%E5%85%B7/" class="print-no-link">#妙妙工具</a>
       
     </div>
   
@@ -308,8 +333,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>cuda-tile 简析</div>
-      <div>https://chuann-sudo.github.io/2025/12/28/cuda-tile-简析/</div>
+      <div>使用marp生成ppt</div>
+      <div>https://chuann-sudo.github.io/2026/01/01/使用marp生成ppt/</div>
     </div>
     <div class="license-meta">
       
@@ -321,7 +346,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2025年12月28日</div>
+          <div>2026年1月1日</div>
         </div>
       
       
@@ -353,18 +378,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2026/01/01/%E4%BD%BF%E7%94%A8marp%E7%94%9F%E6%88%90ppt/" title="使用marp生成ppt">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">使用marp生成ppt</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/12/25/K230-GNNE%E9%A9%B1%E5%8A%A8%E7%A7%BB%E6%A4%8D/" title="K230-GNNE驱动移植">
-                        <span class="hidden-mobile">K230-GNNE驱动移植</span>
+                      <a href="/2025/12/28/cuda-tile-%E7%AE%80%E6%9E%90/" title="cuda-tile 简析">
+                        <span class="hidden-mobile">cuda-tile 简析</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
