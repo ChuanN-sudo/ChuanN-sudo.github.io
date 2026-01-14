@@ -78,7 +78,11 @@
 
 
   
-<meta name="generator" content="Hexo 7.3.0"></head>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head>
 
 
 <body>
@@ -218,7 +222,7 @@
       
       <a class="index-excerpt " href="/2026/01/13/%E5%B8%8C%E5%B0%94%E4%BC%AF%E7%89%B9%E5%8F%98%E6%8D%A2%E7%94%9F%E6%88%90IQ%E4%BF%A1%E5%8F%B7/" target="_self">
         <div>
-          背景笔者最近在做一个小项目，里面有一部分需要做ssb调制，我负责数字信号处理部分，得把语音信号转换成IQ信号输出，用于后续的调制和传输。 传统的IQ信号生成通常需要硬件正交混频器，但在软件无线电架构中，我们可以通过数字信号处理直接生成IQ信号。核心问题是：如何从单路实信号（语音）生成正交的I&#x2F;Q两路信号？ 有一个办法是做 fft，然后直接在负频域对每个点乘以 -1 实现相移，然后 iff
+          背景笔者最近在做一个小项目，里面有一部分需要做ssb调制，我负责数字信号处理部分，得把语音信号转换成IQ信号输出，用于后续的调制和传输。 传统的IQ信号生成通常需要硬件正交混频器，但在软件无线电架构中，我们可以通过数字信号处理直接生成IQ信号。核心问题是：如何从单路实信号（语音）生成正交的I/Q两路信号？ 有一个办法是做 fft，然后直接在负频域对每个点乘以 -1 实现相移，然后 ifft 获得移
         </div>
       </a>
 
@@ -508,7 +512,7 @@
       
       <a class="index-excerpt " href="/2025/12/18/K230-SPI%E9%A9%B1%E5%8A%A8%E7%A7%BB%E6%A4%8D/" target="_self">
         <div>
-          SPI协议简述标准SPISPI（Serial Peripheral Interface）是一种高速、全双工的同步串行通信协议，广泛应用于微控制器与外设（如Flash、传感器、显示屏）之间的通信。 标准SPI时序如下(CPOL &#x3D; 1，CPHA &#x3D; 0)：  注：图中没有标出如下的建立&#x2F;保持时间，这些详细时序要求可以参考芯片手册。  $t_{CSS}$: CS建立时间（
+          SPI协议简述标准SPISPI（Serial Peripheral Interface）是一种高速、全双工的同步串行通信协议，广泛应用于微控制器与外设（如Flash、传感器、显示屏）之间的通信。 标准SPI时序如下(CPOL = 1，CPHA = 0)：  注：图中没有标出如下的建立/保持时间，这些详细时序要求可以参考芯片手册。  $t_{CSS}$: CS建立时间（CS下降沿到第一个时钟上升沿）
         </div>
       </a>
 
