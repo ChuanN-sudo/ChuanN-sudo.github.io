@@ -19,30 +19,30 @@
   <meta name="author" content="ChuanN">
   <meta name="keywords" content="">
   
-    <meta name="description" content="前言最近由于项目和自己整的一些小玩意的要求，需要频繁做ppt，但是笔者又没什么审美，做出来的很难看，格式反复改，经常出现一个PPT做两天的情况😭。而我自己审美本身就是一坨，经常出现改了好几天还是很丑。 那么，有没有什么办法把我们从这种状况下解救出来呢🧐，溜github的时候看到了这个玩意：marp  很好，写markdown这活我很熟了。正巧这玩意还有对应的VS Code插件：  基本使用我们">
+    <meta name="description" content="背景笔者最近在做一个小项目，里面有一部分需要做ssb调制，我负责数字信号处理部分，得把语音信号转换成IQ信号输出，用于后续的调制和传输。 传统的IQ信号生成通常需要硬件正交混频器，但在软件无线电架构中，我们可以通过数字信号处理直接生成IQ信号。核心问题是：如何从单路实信号（语音）生成正交的I&#x2F;Q两路信号？ 有一个办法是做 fft，然后直接在负频域对每个点乘以 -1 实现相移，然后 iff">
 <meta property="og:type" content="article">
-<meta property="og:title" content="使用marp生成ppt">
-<meta property="og:url" content="https://chuann-sudo.github.io/2026/01/01/%E4%BD%BF%E7%94%A8marp%E7%94%9F%E6%88%90ppt/index.html">
+<meta property="og:title" content="希尔伯特变换生成IQ信号">
+<meta property="og:url" content="https://chuann-sudo.github.io/2026/01/13/%E5%B8%8C%E5%B0%94%E4%BC%AF%E7%89%B9%E5%8F%98%E6%8D%A2%E7%94%9F%E6%88%90IQ%E4%BF%A1%E5%8F%B7/index.html">
 <meta property="og:site_name" content="Chuann&#39;s Blogs">
-<meta property="og:description" content="前言最近由于项目和自己整的一些小玩意的要求，需要频繁做ppt，但是笔者又没什么审美，做出来的很难看，格式反复改，经常出现一个PPT做两天的情况😭。而我自己审美本身就是一坨，经常出现改了好几天还是很丑。 那么，有没有什么办法把我们从这种状况下解救出来呢🧐，溜github的时候看到了这个玩意：marp  很好，写markdown这活我很熟了。正巧这玩意还有对应的VS Code插件：  基本使用我们">
+<meta property="og:description" content="背景笔者最近在做一个小项目，里面有一部分需要做ssb调制，我负责数字信号处理部分，得把语音信号转换成IQ信号输出，用于后续的调制和传输。 传统的IQ信号生成通常需要硬件正交混频器，但在软件无线电架构中，我们可以通过数字信号处理直接生成IQ信号。核心问题是：如何从单路实信号（语音）生成正交的I&#x2F;Q两路信号？ 有一个办法是做 fft，然后直接在负频域对每个点乘以 -1 实现相移，然后 iff">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://chuann-sudo.github.io/2026/01/01/%E4%BD%BF%E7%94%A8marp%E7%94%9F%E6%88%90ppt/image-20260102193815610.png">
-<meta property="og:image" content="https://chuann-sudo.github.io/2026/01/01/%E4%BD%BF%E7%94%A8marp%E7%94%9F%E6%88%90ppt/image-20260102193928665.png">
-<meta property="og:image" content="https://chuann-sudo.github.io/2026/01/01/%E4%BD%BF%E7%94%A8marp%E7%94%9F%E6%88%90ppt/image-20260102195553136.png">
-<meta property="og:image" content="https://chuann-sudo.github.io/2026/01/01/%E4%BD%BF%E7%94%A8marp%E7%94%9F%E6%88%90ppt/image-20260102195641735.png">
-<meta property="og:image" content="https://chuann-sudo.github.io/2026/01/01/%E4%BD%BF%E7%94%A8marp%E7%94%9F%E6%88%90ppt/image-20260102201751836.png">
-<meta property="article:published_time" content="2026-01-01T12:02:01.000Z">
-<meta property="article:modified_time" content="2026-01-02T12:21:31.144Z">
+<meta property="og:image" content="https://chuann-sudo.github.io/2026/01/13/%E5%B8%8C%E5%B0%94%E4%BC%AF%E7%89%B9%E5%8F%98%E6%8D%A2%E7%94%9F%E6%88%90IQ%E4%BF%A1%E5%8F%B7/image-20260113234725732.png">
+<meta property="og:image" content="https://chuann-sudo.github.io/2026/01/13/%E5%B8%8C%E5%B0%94%E4%BC%AF%E7%89%B9%E5%8F%98%E6%8D%A2%E7%94%9F%E6%88%90IQ%E4%BF%A1%E5%8F%B7/image-20260113234955083.png">
+<meta property="og:image" content="https://chuann-sudo.github.io/2026/01/13/%E5%B8%8C%E5%B0%94%E4%BC%AF%E7%89%B9%E5%8F%98%E6%8D%A2%E7%94%9F%E6%88%90IQ%E4%BF%A1%E5%8F%B7/image-20260114121653052.png">
+<meta property="og:image" content="https://chuann-sudo.github.io/2026/01/13/%E5%B8%8C%E5%B0%94%E4%BC%AF%E7%89%B9%E5%8F%98%E6%8D%A2%E7%94%9F%E6%88%90IQ%E4%BF%A1%E5%8F%B7/image-20260114125708274.png">
+<meta property="article:published_time" content="2026-01-13T14:42:20.000Z">
+<meta property="article:modified_time" content="2026-01-14T04:58:02.840Z">
 <meta property="article:author" content="ChuanN">
-<meta property="article:tag" content="自动化">
-<meta property="article:tag" content="ppt">
-<meta property="article:tag" content="妙妙工具">
+<meta property="article:tag" content="嵌入式">
+<meta property="article:tag" content="数字信号处理">
+<meta property="article:tag" content="蒜苔">
+<meta property="article:tag" content="软件无线电">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://chuann-sudo.github.io/2026/01/01/%E4%BD%BF%E7%94%A8marp%E7%94%9F%E6%88%90ppt/image-20260102193815610.png">
+<meta name="twitter:image" content="https://chuann-sudo.github.io/2026/01/13/%E5%B8%8C%E5%B0%94%E4%BC%AF%E7%89%B9%E5%8F%98%E6%8D%A2%E7%94%9F%E6%88%90IQ%E4%BF%A1%E5%8F%B7/image-20260113234725732.png">
   
   
   
-  <title>使用marp生成ppt - Chuann&#39;s Blogs</title>
+  <title>希尔伯特变换生成IQ信号 - Chuann&#39;s Blogs</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -188,7 +188,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="使用marp生成ppt"></span>
+            <span id="subtitle" data-typed-text="希尔伯特变换生成IQ信号"></span>
           
         </div>
 
@@ -199,8 +199,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2026-01-01 20:02" pubdate>
-          2026年1月1日 晚上
+        <time datetime="2026-01-13 22:42" pubdate>
+          2026年1月13日 晚上
         </time>
       </span>
     
@@ -211,7 +211,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1k 字
+          2.1k 字
         
       </span>
     
@@ -222,7 +222,7 @@
         
         
         
-          9 分钟
+          18 分钟
         
       </span>
     
@@ -259,31 +259,39 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">使用marp生成ppt</h1>
+            <h1 id="seo-header">希尔伯特变换生成IQ信号</h1>
             
             
               <div class="markdown-body">
                 
-                <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>最近由于项目和自己整的一些小玩意的要求，需要频繁做ppt，但是笔者又没什么审美，做出来的很难看，格式反复改，经常出现一个PPT做两天的情况😭。而我自己审美本身就是一坨，经常出现改了好几天还是很丑。</p>
-<p>那么，有没有什么办法把我们从这种状况下解救出来呢🧐，溜github的时候看到了这个玩意：<a href="https://github.com/marp-team/marp">marp</a></p>
-<p><img src="/2026/01/01/%E4%BD%BF%E7%94%A8marp%E7%94%9F%E6%88%90ppt/image-20260102193815610.png" alt="marp GitHub页面"></p>
-<p>很好，写markdown这活我很熟了。正巧这玩意还有对应的VS Code插件：</p>
-<p><img src="/2026/01/01/%E4%BD%BF%E7%94%A8marp%E7%94%9F%E6%88%90ppt/image-20260102193928665.png" alt="Marp for VS Code"></p>
-<h2 id="基本使用"><a href="#基本使用" class="headerlink" title="基本使用"></a>基本使用</h2><p>我们在VS code里面写几行小代码：</p>
-<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs markdown">---<br>marp: true<br>title: 个人汇报<br>paginate: true<br><span class="hljs-section">theme: uncover</span><br><span class="hljs-section">---</span><br><span class="hljs-section"># XXX 工作汇报</span><br><span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">br</span>/&gt;</span></span><br><span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">br</span>/&gt;</span></span><br><span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">br</span>/&gt;</span></span><br><br><span class="hljs-bullet">-</span> 汇报人：Chuann<br><span class="hljs-section">- 日期：2025-1-2</span><br><span class="hljs-section">---</span><br><span class="hljs-section">## 工作总览</span><br><span class="hljs-bullet">-</span> 方向：负责XXXXX 的XXXXX工作<br><span class="hljs-bullet">-</span> 主要工作：<br><span class="hljs-bullet">  -</span> XXX项目硬件电路问题排查<br><span class="hljs-bullet">  -</span> XXXX实验方案设计<br><span class="hljs-bullet">  -</span> 为XXX模块新增了XXXX功能<br><br>---<br><span class="hljs-section"># <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">big</span>&gt;</span></span><span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">center</span> <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;font-size: 200px;&quot;</span>&gt;</span></span> 谢谢！<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">center</span>&gt;</span></span><span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">big</span>&gt;</span></span></span><br>&lt;!---<br>谢谢大家。<br>---&gt;<br></code></pre></td></tr></table></figure>
+                <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>笔者最近在做一个小项目，里面有一部分需要做ssb调制，我负责数字信号处理部分，得把语音信号转换成IQ信号输出，用于后续的调制和传输。</p>
+<p>传统的IQ信号生成通常需要硬件正交混频器，但在软件无线电架构中，我们可以通过数字信号处理直接生成IQ信号。核心问题是：如何从单路实信号（语音）生成正交的I&#x2F;Q两路信号？</p>
+<p>有一个办法是做 fft，然后直接在负频域对每个点乘以 -1 实现相移，然后 ifft 获得移相后的信号。这个方案有个缺点，板子上需要跑其他任务，fft 有些吃资源了，而且(补充另一个缺点)</p>
+<p>希尔伯特变换提供了一个优雅的解决方案：通过对实信号进行90度相移，可以直接生成解析信号（复信号），其实部和虚部就是I和Q分量。</p>
+<h2 id="希尔伯特变换原理"><a href="#希尔伯特变换原理" class="headerlink" title="希尔伯特变换原理"></a>希尔伯特变换原理</h2><p>对于实信号 $s(t)$，做希尔伯特变换本质是将其与 $1&#x2F;(πt)$ 进行卷积：<br>$$<br>s̃(t) &#x3D; s(t) * 1&#x2F;(πt)<br>$$<br>实质上是对信号的所有信号加一个90读的相移，最终得到解析信号，也就是 IQ：<br>$$<br>z(t) &#x3D; s(t) + j·s̃(t) \<br>z(t) &#x3D; I(t) + j·Q(t)<br>$$<br>也得到了解析信号，也就是 IQ。可以直接扔给dac，进而输出给射频前端进行调制。</p>
+<p>当然，对于PSK等相位调制，也可以计算其相位突变进行解调。</p>
+<p>对于语音信号（典型带宽300Hz-3400Hz），希尔伯特变换可以很好地生成正交分量，满足IQ输出的需求。</p>
+<h2 id="仿真"><a href="#仿真" class="headerlink" title="仿真"></a>仿真</h2><p>以音频经典16Khz采样率为例，在matlab中弄了一个100阶，通带归一化频率为 0.01-0.99 的希尔伯特变换器：</p>
+<p><img src="/2026/01/13/%E5%B8%8C%E5%B0%94%E4%BC%AF%E7%89%B9%E5%8F%98%E6%8D%A2%E7%94%9F%E6%88%90IQ%E4%BF%A1%E5%8F%B7/image-20260113234725732.png" alt="希尔伯特变换器"></p>
+<p>实际通带大概在 80Hz-7.9KHz，带内波动1dB，基本可以接收，移相稳定在-90度。</p>
+<p>给两个频率的信号进去看一下相位差：</p>
+<p><img src="/2026/01/13/%E5%B8%8C%E5%B0%94%E4%BC%AF%E7%89%B9%E5%8F%98%E6%8D%A2%E7%94%9F%E6%88%90IQ%E4%BF%A1%E5%8F%B7/image-20260113234955083.png" alt="1Khz/2Khz IQ信号补偿群延迟"></p>
+<p>效果也挺好，1KHZ和2KHz位置相位差都是-90度，幅度基本一致。注意，这里对Q路信号的群延迟进行了补偿，I路挂了一个全通滤波器。我们看看不接滤波器有没有什么影响：</p>
+<p><img src="/2026/01/13/%E5%B8%8C%E5%B0%94%E4%BC%AF%E7%89%B9%E5%8F%98%E6%8D%A2%E7%94%9F%E6%88%90IQ%E4%BF%A1%E5%8F%B7/image-20260114121653052.png" alt="1Khz/2Khz IQ信号不补偿群延迟"></p>
+<p>幅度没什么变化，相位已经炸了，为什么呢？分析一下原因：</p>
+<p>对于一个线性相位 FIR 滤波器，群延迟是一个固定的时间延迟 τ，表示信号通过滤波器后的时间偏移。</p>
+<p>对于 N 阶 采样率为 $F_s$ 的FIR 滤波器，其群延迟为：<br>$$<br>\tau &#x3D; \frac{N}{2 \cdot F_s}<br>$$<br>固定的时间延迟 τ 在频率 f 处产生的相位延迟为：<br>$$<br>\phi(f) &#x3D; -2\pi f \cdot \tau &#x3D; -2\pi f \cdot \frac{N}{2 \cdot F_s}<br>$$<br>也就是相位延迟与频率成正比，频率越高，相位延迟越大。</p>
+<p>对于N 阶希尔伯特变换器而言，理想频率响应为<br>$$<br>H_{Hilbert}(f) &#x3D; -j \cdot \text{sign}(f) \cdot e^{-j2\pi f \tau}<br>$$<br>相位分解为两部分：</p>
+<ol>
+<li><strong>Hilbert 相移</strong>：-90°（对应 $-j$）</li>
+<li><strong>群延迟相移</strong>：$-2\pi f \cdot \frac{N}{2 \cdot F_s}$</li>
+</ol>
+<p>那么输出Q路信号的总相位为：<br>$$<br>\phi_Q(f) &#x3D; -90° - 2\pi f \cdot \frac{N}{2 \cdot F_s}<br>$$<br>如果能在I路加一个N阶段的全通FIR，补偿$-2\pi f \cdot \frac{N}{2 \cdot F_s}$这一部分的理想相位延迟，就能让所有通带各个频率的相位延迟为 -90 度。<br>$$<br>\Delta\phi(f) &#x3D; \phi_Q(f) - \phi_I(f) &#x3D; \left(-90° - 2\pi f \cdot \frac{N}{2 \cdot F_s}\right) - \left(-2\pi f \cdot \frac{N}{2 \cdot F_s}\right) &#x3D; -90°<br>$$<br>构成了理想希尔伯特变换器。</p>
+<p>如果不补偿群延迟的话，计算一下$F_s$为16KHz，N为100，频率分别为1Khz和2Khz的相位：</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs matlab">Fs = <span class="hljs-number">16000</span>;<br>N = <span class="hljs-number">100</span>;<br>tau_delay = N/<span class="hljs-number">2</span> / Fs;  <br><br>f_test = [<span class="hljs-number">1000</span>, <span class="hljs-number">2000</span>];<br><br>phase_I = <span class="hljs-number">-2</span>*<span class="hljs-built_in">pi</span> * f_test * tau_delay * <span class="hljs-number">180</span>/<span class="hljs-built_in">pi</span>; <br>phase_Q = <span class="hljs-number">-90</span> - <span class="hljs-number">2</span>*<span class="hljs-built_in">pi</span> * f_test * tau_delay * <span class="hljs-number">180</span>/<span class="hljs-built_in">pi</span>;<br><br>theory_diff = phase_Q - phase_I;<br>theory_diff = <span class="hljs-built_in">mod</span>(theory_diff + <span class="hljs-number">180</span>, <span class="hljs-number">360</span>) - <span class="hljs-number">180</span>;  <span class="hljs-comment">% 归一化相位差</span><br><br>phase_I_norm = <span class="hljs-built_in">mod</span>(phase_I + <span class="hljs-number">180</span>, <span class="hljs-number">360</span>) - <span class="hljs-number">180</span>;<br>phase_Q_norm = <span class="hljs-built_in">mod</span>(phase_Q + <span class="hljs-number">180</span>, <span class="hljs-number">360</span>) - <span class="hljs-number">180</span>;<br><br>fprintf(<span class="hljs-string">&#x27;1000 Hz: I相位=%.2f°, Q相位=%.2f°, 差值=%.2f°\n&#x27;</span>, ...<br>    phase_I_norm(<span class="hljs-number">1</span>), phase_Q_norm(<span class="hljs-number">1</span>), theory_diff(<span class="hljs-number">1</span>));<br>fprintf(<span class="hljs-string">&#x27;2000 Hz: I相位=%.2f°, Q相位=%.2f°, 差值=%.2f°\n&#x27;</span>, ...<br>    phase_I_norm(<span class="hljs-number">2</span>), phase_Q_norm(<span class="hljs-number">2</span>), theory_diff(<span class="hljs-number">2</span>));<br></code></pre></td></tr></table></figure>
 
-<p>代码里面，<code>---</code>是ppt的分页命令，开头是一些配置设置，主题什么的，其他写法和markdown一样，也支持嵌入html语法。</p>
-<p>然后我们点这个按钮，打开实时预览：</p>
-<p><img src="/2026/01/01/%E4%BD%BF%E7%94%A8marp%E7%94%9F%E6%88%90ppt/image-20260102195553136.png" alt="打开实时预览"></p>
-<p>右侧就能看到实时渲染的ppt了</p>
-<p><img src="/2026/01/01/%E4%BD%BF%E7%94%A8marp%E7%94%9F%E6%88%90ppt/image-20260102195641735.png" alt="实时渲染ppt"></p>
-<p>比如我用html语法塞一张图片进去(markdown自己的图片插入语法也行，但我用html多一些)：</p>
-<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs markdown"><br><span class="hljs-section">## 工作总览</span><br><span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;image.png&quot;</span> <span class="hljs-attr">width</span>=<span class="hljs-string">&quot;400&quot;</span> <span class="hljs-attr">align</span>=<span class="hljs-string">&quot;right&quot;</span> <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;margin-right: 20px;&quot;</span>&gt;</span></span><br><br><span class="hljs-bullet">-</span> 方向：负责XXXXX 的XXXXX工作<br><span class="hljs-bullet">-</span> 主要工作：<br><span class="hljs-bullet">  -</span> XXX项目硬件电路问题排查<br><span class="hljs-bullet">  -</span> XXXX实验方案设计<br><span class="hljs-bullet">  -</span> 为XXX模块新增了XXXX功能<br><br></code></pre></td></tr></table></figure>
-
-<p>渲染出来是这样的：</p>
-<p><img src="/2026/01/01/%E4%BD%BF%E7%94%A8marp%E7%94%9F%E6%88%90ppt/image-20260102201751836.png" alt="插入图片"></p>
-<p>基本的用法就是这种，这么看，用marp还是要写代码，对于不熟悉markdown的朋友并不友好🤔。但是笔者认为marp这里代码生成ppt的工具，其最大价值主要是可以使用ai生成了，流程熟悉以后抽AI鞭子就行了🤓。</p>
-<h3 id="进阶用法"><a href="#进阶用法" class="headerlink" title="进阶用法"></a>进阶用法</h3><p>待续，后续会补充自定义主题以及导入主题，设置背景等用法</p>
+<p><img src="/2026/01/13/%E5%B8%8C%E5%B0%94%E4%BC%AF%E7%89%B9%E5%8F%98%E6%8D%A2%E7%94%9F%E6%88%90IQ%E4%BF%A1%E5%8F%B7/image-20260114125708274.png" alt="群延迟仿真输出"></p>
+<p>嗯，和之前希尔伯特变换器不补偿群延迟的仿真对上了，说明理论没问题。</p>
 
                 
               </div>
@@ -302,7 +310,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E5%A6%99%E5%A6%99%E5%B7%A5%E5%85%B7/" class="category-chain-item">妙妙工具</a>
+  <a href="/categories/%E8%92%9C%E8%8B%94/" class="category-chain-item">蒜苔</a>
   
   
 
@@ -317,11 +325,13 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/%E8%87%AA%E5%8A%A8%E5%8C%96/" class="print-no-link">#自动化</a>
+        <a href="/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/" class="print-no-link">#嵌入式</a>
       
-        <a href="/tags/ppt/" class="print-no-link">#ppt</a>
+        <a href="/tags/%E6%95%B0%E5%AD%97%E4%BF%A1%E5%8F%B7%E5%A4%84%E7%90%86/" class="print-no-link">#数字信号处理</a>
       
-        <a href="/tags/%E5%A6%99%E5%A6%99%E5%B7%A5%E5%85%B7/" class="print-no-link">#妙妙工具</a>
+        <a href="/tags/%E8%92%9C%E8%8B%94/" class="print-no-link">#蒜苔</a>
+      
+        <a href="/tags/%E8%BD%AF%E4%BB%B6%E6%97%A0%E7%BA%BF%E7%94%B5/" class="print-no-link">#软件无线电</a>
       
     </div>
   
@@ -333,8 +343,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>使用marp生成ppt</div>
-      <div>https://chuann-sudo.github.io/2026/01/01/使用marp生成ppt/</div>
+      <div>希尔伯特变换生成IQ信号</div>
+      <div>https://chuann-sudo.github.io/2026/01/13/希尔伯特变换生成IQ信号/</div>
     </div>
     <div class="license-meta">
       
@@ -346,7 +356,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2026年1月1日</div>
+          <div>2026年1月13日</div>
         </div>
       
       
@@ -378,18 +388,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2026/01/13/%E5%B8%8C%E5%B0%94%E4%BC%AF%E7%89%B9%E5%8F%98%E6%8D%A2%E7%94%9F%E6%88%90IQ%E4%BF%A1%E5%8F%B7/" title="希尔伯特变换生成IQ信号">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">希尔伯特变换生成IQ信号</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/12/28/cuda-tile-%E7%AE%80%E6%9E%90/" title="cuda-tile 简析">
-                        <span class="hidden-mobile">cuda-tile 简析</span>
+                      <a href="/2026/01/01/%E4%BD%BF%E7%94%A8marp%E7%94%9F%E6%88%90ppt/" title="使用marp生成ppt">
+                        <span class="hidden-mobile">使用marp生成ppt</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

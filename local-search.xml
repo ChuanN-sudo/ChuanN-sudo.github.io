@@ -4,6 +4,37 @@
   
   
   <entry>
+    <title>希尔伯特变换生成IQ信号</title>
+    <link href="/2026/01/13/%E5%B8%8C%E5%B0%94%E4%BC%AF%E7%89%B9%E5%8F%98%E6%8D%A2%E7%94%9F%E6%88%90IQ%E4%BF%A1%E5%8F%B7/"/>
+    <url>/2026/01/13/%E5%B8%8C%E5%B0%94%E4%BC%AF%E7%89%B9%E5%8F%98%E6%8D%A2%E7%94%9F%E6%88%90IQ%E4%BF%A1%E5%8F%B7/</url>
+    
+    <content type="html"><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>笔者最近在做一个小项目，里面有一部分需要做ssb调制，我负责数字信号处理部分，得把语音信号转换成IQ信号输出，用于后续的调制和传输。</p><p>传统的IQ信号生成通常需要硬件正交混频器，但在软件无线电架构中，我们可以通过数字信号处理直接生成IQ信号。核心问题是：如何从单路实信号（语音）生成正交的I&#x2F;Q两路信号？</p><p>有一个办法是做 fft，然后直接在负频域对每个点乘以 -1 实现相移，然后 ifft 获得移相后的信号。这个方案有个缺点，板子上需要跑其他任务，fft 有些吃资源了，而且(补充另一个缺点)</p><p>希尔伯特变换提供了一个优雅的解决方案：通过对实信号进行90度相移，可以直接生成解析信号（复信号），其实部和虚部就是I和Q分量。</p><h2 id="希尔伯特变换原理"><a href="#希尔伯特变换原理" class="headerlink" title="希尔伯特变换原理"></a>希尔伯特变换原理</h2><p>对于实信号 $s(t)$，做希尔伯特变换本质是将其与 $1&#x2F;(πt)$ 进行卷积：<br>$$<br>s̃(t) &#x3D; s(t) * 1&#x2F;(πt)<br>$$<br>实质上是对信号的所有信号加一个90读的相移，最终得到解析信号，也就是 IQ：<br>$$<br>z(t) &#x3D; s(t) + j·s̃(t) \<br>z(t) &#x3D; I(t) + j·Q(t)<br>$$<br>也得到了解析信号，也就是 IQ。可以直接扔给dac，进而输出给射频前端进行调制。</p><p>当然，对于PSK等相位调制，也可以计算其相位突变进行解调。</p><p>对于语音信号（典型带宽300Hz-3400Hz），希尔伯特变换可以很好地生成正交分量，满足IQ输出的需求。</p><h2 id="仿真"><a href="#仿真" class="headerlink" title="仿真"></a>仿真</h2><p>以音频经典16Khz采样率为例，在matlab中弄了一个100阶，通带归一化频率为 0.01-0.99 的希尔伯特变换器：</p><p><img src="/2026/01/13/%E5%B8%8C%E5%B0%94%E4%BC%AF%E7%89%B9%E5%8F%98%E6%8D%A2%E7%94%9F%E6%88%90IQ%E4%BF%A1%E5%8F%B7/image-20260113234725732.png" alt="希尔伯特变换器"></p><p>实际通带大概在 80Hz-7.9KHz，带内波动1dB，基本可以接收，移相稳定在-90度。</p><p>给两个频率的信号进去看一下相位差：</p><p><img src="/2026/01/13/%E5%B8%8C%E5%B0%94%E4%BC%AF%E7%89%B9%E5%8F%98%E6%8D%A2%E7%94%9F%E6%88%90IQ%E4%BF%A1%E5%8F%B7/image-20260113234955083.png" alt="1Khz/2Khz IQ信号补偿群延迟"></p><p>效果也挺好，1KHZ和2KHz位置相位差都是-90度，幅度基本一致。注意，这里对Q路信号的群延迟进行了补偿，I路挂了一个全通滤波器。我们看看不接滤波器有没有什么影响：</p><p><img src="/2026/01/13/%E5%B8%8C%E5%B0%94%E4%BC%AF%E7%89%B9%E5%8F%98%E6%8D%A2%E7%94%9F%E6%88%90IQ%E4%BF%A1%E5%8F%B7/image-20260114121653052.png" alt="1Khz/2Khz IQ信号不补偿群延迟"></p><p>幅度没什么变化，相位已经炸了，为什么呢？分析一下原因：</p><p>对于一个线性相位 FIR 滤波器，群延迟是一个固定的时间延迟 τ，表示信号通过滤波器后的时间偏移。</p><p>对于 N 阶 采样率为 $F_s$ 的FIR 滤波器，其群延迟为：<br>$$<br>\tau &#x3D; \frac{N}{2 \cdot F_s}<br>$$<br>固定的时间延迟 τ 在频率 f 处产生的相位延迟为：<br>$$<br>\phi(f) &#x3D; -2\pi f \cdot \tau &#x3D; -2\pi f \cdot \frac{N}{2 \cdot F_s}<br>$$<br>也就是相位延迟与频率成正比，频率越高，相位延迟越大。</p><p>对于N 阶希尔伯特变换器而言，理想频率响应为<br>$$<br>H_{Hilbert}(f) &#x3D; -j \cdot \text{sign}(f) \cdot e^{-j2\pi f \tau}<br>$$<br>相位分解为两部分：</p><ol><li><strong>Hilbert 相移</strong>：-90°（对应 $-j$）</li><li><strong>群延迟相移</strong>：$-2\pi f \cdot \frac{N}{2 \cdot F_s}$</li></ol><p>那么输出Q路信号的总相位为：<br>$$<br>\phi_Q(f) &#x3D; -90° - 2\pi f \cdot \frac{N}{2 \cdot F_s}<br>$$<br>如果能在I路加一个N阶段的全通FIR，补偿$-2\pi f \cdot \frac{N}{2 \cdot F_s}$这一部分的理想相位延迟，就能让所有通带各个频率的相位延迟为 -90 度。<br>$$<br>\Delta\phi(f) &#x3D; \phi_Q(f) - \phi_I(f) &#x3D; \left(-90° - 2\pi f \cdot \frac{N}{2 \cdot F_s}\right) - \left(-2\pi f \cdot \frac{N}{2 \cdot F_s}\right) &#x3D; -90°<br>$$<br>构成了理想希尔伯特变换器。</p><p>如果不补偿群延迟的话，计算一下$F_s$为16KHz，N为100，频率分别为1Khz和2Khz的相位：</p><figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs matlab">Fs = <span class="hljs-number">16000</span>;<br>N = <span class="hljs-number">100</span>;<br>tau_delay = N/<span class="hljs-number">2</span> / Fs;  <br><br>f_test = [<span class="hljs-number">1000</span>, <span class="hljs-number">2000</span>];<br><br>phase_I = <span class="hljs-number">-2</span>*<span class="hljs-built_in">pi</span> * f_test * tau_delay * <span class="hljs-number">180</span>/<span class="hljs-built_in">pi</span>; <br>phase_Q = <span class="hljs-number">-90</span> - <span class="hljs-number">2</span>*<span class="hljs-built_in">pi</span> * f_test * tau_delay * <span class="hljs-number">180</span>/<span class="hljs-built_in">pi</span>;<br><br>theory_diff = phase_Q - phase_I;<br>theory_diff = <span class="hljs-built_in">mod</span>(theory_diff + <span class="hljs-number">180</span>, <span class="hljs-number">360</span>) - <span class="hljs-number">180</span>;  <span class="hljs-comment">% 归一化相位差</span><br><br>phase_I_norm = <span class="hljs-built_in">mod</span>(phase_I + <span class="hljs-number">180</span>, <span class="hljs-number">360</span>) - <span class="hljs-number">180</span>;<br>phase_Q_norm = <span class="hljs-built_in">mod</span>(phase_Q + <span class="hljs-number">180</span>, <span class="hljs-number">360</span>) - <span class="hljs-number">180</span>;<br><br>fprintf(<span class="hljs-string">&#x27;1000 Hz: I相位=%.2f°, Q相位=%.2f°, 差值=%.2f°\n&#x27;</span>, ...<br>    phase_I_norm(<span class="hljs-number">1</span>), phase_Q_norm(<span class="hljs-number">1</span>), theory_diff(<span class="hljs-number">1</span>));<br>fprintf(<span class="hljs-string">&#x27;2000 Hz: I相位=%.2f°, Q相位=%.2f°, 差值=%.2f°\n&#x27;</span>, ...<br>    phase_I_norm(<span class="hljs-number">2</span>), phase_Q_norm(<span class="hljs-number">2</span>), theory_diff(<span class="hljs-number">2</span>));<br></code></pre></td></tr></table></figure><p><img src="/2026/01/13/%E5%B8%8C%E5%B0%94%E4%BC%AF%E7%89%B9%E5%8F%98%E6%8D%A2%E7%94%9F%E6%88%90IQ%E4%BF%A1%E5%8F%B7/image-20260114125708274.png" alt="群延迟仿真输出"></p><p>嗯，和之前希尔伯特变换器不补偿群延迟的仿真对上了，说明理论没问题。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>蒜苔</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>嵌入式</tag>
+      
+      <tag>数字信号处理</tag>
+      
+      <tag>蒜苔</tag>
+      
+      <tag>软件无线电</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>使用marp生成ppt</title>
     <link href="/2026/01/01/%E4%BD%BF%E7%94%A8marp%E7%94%9F%E6%88%90ppt/"/>
     <url>/2026/01/01/%E4%BD%BF%E7%94%A8marp%E7%94%9F%E6%88%90ppt/</url>
